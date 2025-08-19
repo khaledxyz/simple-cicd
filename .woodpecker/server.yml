@@ -31,7 +31,11 @@ steps:
     directory: server/
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      SERVER_ENV_FILE:
+        from_secret: SERVER_ENV_FILE
     commands:
+      - echo "$${SERVER_ENV_FILE}" > .env
       - docker build -t registry.local:2525/simple-cicd-server:$CI_COMMIT_SHA -t registry.local:2525/simple-cicd-server:latest .
       - docker push registry.local:2525/simple-cicd-server:$CI_COMMIT_SHA
       - docker push registry.local:2525/simple-cicd-server:latest
@@ -46,13 +50,10 @@ steps:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      SERVER_ENV_FILE:
-        from_secret: SERVER_ENV_FILE
       INFRA_ENV_FILE:
         from_secret: INFRA_ENV_FILE
     commands:
-      - echo "$${SERVER_ENV_FILE}" > .env
-      - echo "$${INFRA_ENV_FILE}" >> .env
+      - echo "$${INFRA_ENV_FILE}" > .env
       - docker-compose pull
       - docker-compose up -d
     depends_on:
