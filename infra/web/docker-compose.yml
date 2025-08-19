@@ -21,7 +21,7 @@ services:
       - "traefik.http.routers.web-https.service=web-service"
 
       # Internal service mapping
-      - "traefik.http.services.web-service.loadbalancer.server.port=3000"
+      - "traefik.http.services.web-service.loadbalancer.server.port=80"
 
 networks:
   proxy:
