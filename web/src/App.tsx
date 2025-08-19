@@ -1,10 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 
 function App() {
   const [count, setCount] = useState(0);
+  const [expressVersion, setExpressVersion] = useState<string>("...");
+
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL}/version`)
+      .then((res) => res.json())
+      .then((data) => {
+        setExpressVersion(data.version);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch version:", err);
+        setExpressVersion("error");
+      });
+  }, []);
 
   return (
     <>
@@ -17,6 +30,7 @@ function App() {
         </a>
       </div>
       <h1>Vite + React + v4</h1>
+      <h2>express {expressVersion}</h2>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
