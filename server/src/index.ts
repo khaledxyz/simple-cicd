@@ -10,7 +10,7 @@ app.get("/health", (req: Request, res: Response) => {
 
 // example root route
 app.get("/", (req: Request, res: Response) => {
-  res.send("Hello, TypeScript + Express! v3");
+  res.send("Hello, TypeScript + Express! v4");
 });
 
 app.listen(PORT, () => {
