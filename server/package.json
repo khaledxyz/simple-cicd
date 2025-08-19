@@ -10,6 +10,8 @@
     "lint:fix": "eslint src/**/*.ts --fix"
   },
   "dependencies": {
+    "@types/cors": "^2.8.19",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^4.18.2"
   },
