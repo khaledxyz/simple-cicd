@@ -34,11 +34,8 @@ steps:
     environment:
       WEB_ENV_FILE:
         from_secret: WEB_ENV_FILE
-      INFRA_ENV_FILE:
-        from_secret: INFRA_ENV_FILE
     commands:
       - echo "$${WEB_ENV_FILE}" > .env
-      - echo "$${INFRA_ENV_FILE}" >> .env
       - docker build -t registry.local:2525/simple-cicd-web:$CI_COMMIT_SHA -t registry.local:2525/simple-cicd-web:latest .
       - docker push registry.local:2525/simple-cicd-web:$CI_COMMIT_SHA
       - docker push registry.local:2525/simple-cicd-web:latest
@@ -52,7 +49,11 @@ steps:
     directory: infra/web/
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      INFRA_ENV_FILE:
+        from_secret: INFRA_ENV_FILE
     commands:
+      - echo "$${INFRA_ENV_FILE}" > .env
       - docker-compose pull
       - docker-compose up -d
     depends_on:
