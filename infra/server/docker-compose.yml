@@ -1,7 +1,7 @@
 services:
   server:
     container_name: server
-    image: registry.local/simple-cicd-server:latest
+    image: registry.local:2525/simple-cicd-server:latest
     restart: unless-stopped
     networks:
       - proxy
