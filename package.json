@@ -1,0 +1,28 @@
+{
+  "name": "simple-cicd",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter server dev\" \"pnpm --filter web dev\"",
+    "docker:prod": "docker-compose up --build",
+    "dev:server": "pnpm --filter server dev",
+    "dev:web": "pnpm --filter web dev",
+    "build": "pnpm --filter server build && pnpm --filter web build",
+    "build:server": "pnpm --filter server build",
+    "build:web": "pnpm --filter web build",
+    "start": "pnpm --filter server start",
+    "lint": "pnpm --filter server lint && pnpm --filter web lint",
+    "lint:fix": "pnpm --filter server lint:fix && pnpm --filter web lint:fix",
+    "clean": "rm -rf server/dist server/node_modules web/dist web/node_modules node_modules",
+    "install:all": "npm install",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "husky": "^9.1.7"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=10"
+  }
+}

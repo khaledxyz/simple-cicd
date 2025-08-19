@@ -1,0 +1,61 @@
+variables:
+  - &node_image "docker.io/node:23-alpine"
+  - &docker_image "docker:24-dind"
+
+when:
+  - event: [push, pull_request]
+    branch: [master]
+    path:
+      - "web/**"
+      - ".woodpecker/web.yaml"
+
+steps:
+  install-dependencies:
+    image: *node_image
+    directory: web/
+    commands:
+      - corepack enable
+      - pnpm install --frozen-lockfile
+
+  lint:
+    image: *node_image
+    directory: web/
+    commands:
+      - corepack enable
+      - pnpm lint
+    depends_on:
+      - install-dependencies
+
+  build:
+    image: *docker_image
+    directory: web/
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      WEB_ENV_FILE:
+        from_secret: WEB_ENV_FILE
+      INFRA_ENV_FILE:
+        from_secret: INFRA_ENV_FILE
+    commands:
+      - echo "$${WEB_ENV_FILE}" > .env
+      - echo "$${INFRA_ENV_FILE}" >> .env
+      - docker build -t registry.local:2525/simple-cicd-web:$CI_COMMIT_SHA -t registry.local:2525/simple-cicd-web:latest .
+      - docker push registry.local:2525/simple-cicd-web:$CI_COMMIT_SHA
+      - docker push registry.local:2525/simple-cicd-web:latest
+    depends_on:
+      - lint
+    when:
+      - event: push
+
+  deploy:
+    image: *docker_image
+    directory: infra/web/
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - docker-compose pull
+      - docker-compose up -d
+    depends_on:
+      - build
+    when:
+      - event: push

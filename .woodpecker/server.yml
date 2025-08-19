@@ -1,0 +1,61 @@
+variables:
+  - &node_image "docker.io/node:23-alpine"
+  - &docker_image "docker:24-dind"
+
+when:
+  - event: [push, pull_request]
+    branch: [master]
+    path:
+      - "server/**"
+      - ".woodpecker/server.yaml"
+
+steps:
+  install-dependencies:
+    image: *node_image
+    directory: server/
+    commands:
+      - corepack enable
+      - pnpm install --frozen-lockfile
+
+  lint:
+    image: *node_image
+    directory: server/
+    commands:
+      - corepack enable
+      - pnpm lint
+    depends_on:
+      - install-dependencies
+
+  build:
+    image: *docker_image
+    directory: server/
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - docker build -t registry.local:2525/simple-cicd-server:$CI_COMMIT_SHA -t registry.local:2525/simple-cicd-server:latest .
+      - docker push registry.local:2525/simple-cicd-server:$CI_COMMIT_SHA
+      - docker push registry.local:2525/simple-cicd-server:latest
+    depends_on:
+      - lint
+    when:
+      - event: push
+
+  deploy:
+    image: *docker_image
+    directory: infra/server/
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      SERVER_ENV_FILE:
+        from_secret: SERVER_ENV_FILE
+      INFRA_ENV_FILE:
+        from_secret: INFRA_ENV_FILE
+    commands:
+      - echo "$${SERVER_ENV_FILE}" > .env
+      - echo "$${INFRA_ENV_FILE}" >> .env
+      - docker-compose pull
+      - docker-compose up -d
+    depends_on:
+      - build
+    when:
+      - event: push

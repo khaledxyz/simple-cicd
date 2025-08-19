@@ -1,0 +1,29 @@
+services:
+  server:
+    container_name: server
+    image: registry.local/simple-cicd-server:latest
+    restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+
+      # HTTP router → redirect to HTTPS
+      - "traefik.http.routers.server-http.rule=Host(`${SERVER_DOMAIN}`)"
+      - "traefik.http.routers.server-http.entrypoints=http"
+      - "traefik.http.routers.server-http.middlewares=https-redirect"
+
+      # HTTPS router
+      - "traefik.http.routers.server-https.rule=Host(`${SERVER_DOMAIN}`)"
+      - "traefik.http.routers.server-https.entrypoints=https"
+      - "traefik.http.routers.server-https.tls=true"
+      - "traefik.http.routers.server-https.tls.certresolver=le"
+      - "traefik.http.routers.server-https.service=server-service"
+
+      # Internal service mapping
+      - "traefik.http.services.server-service.loadbalancer.server.port=5000"
+
+networks:
+  proxy:
+    external: true
+    name: ${TRAEFIK_NETWORK}

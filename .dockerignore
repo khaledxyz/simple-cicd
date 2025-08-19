@@ -1,0 +1,62 @@
+# Dependencies
+node_modules
+*/node_modules
+.pnpm-store
+
+# Build artifacts
+server/dist
+web/dist
+web/build
+
+# Development files
+*.log
+npm-debug.log*
+pnpm-debug.log*
+.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# CI/CD
+.woodpecker
+.github
+.gitlab-ci.yml
+
+# Documentation
+*.md
+docs/
+
+# Testing
+coverage/
+.nyc_output/
+test-results/
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Temporary files
+tmp/
+temp/
