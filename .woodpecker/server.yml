@@ -1,6 +1,6 @@
 variables:
   - &node_image "docker.io/node:23-alpine"
-  - &docker_image "docker:24-dind"
+  - &docker_image "docker:28-dind"
 
 when:
   - event: [push, pull_request]
