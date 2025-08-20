@@ -7,12 +7,16 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
 
 # Copy package files
-COPY pnpm-lock.yaml package.json ./
+COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Copy all files
+# Build-time variable
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL}
+
+# Copy source code
 COPY . .
 
 # Build the app
@@ -20,15 +24,6 @@ RUN pnpm build
 
 # Production stage
 FROM nginx:alpine
-
-# Copy built assets to nginx
 COPY --from=build /app/dist /usr/share/nginx/html
-
-# Copy nginx configuration if you have custom config
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port 80
 EXPOSE 80
-
-# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
