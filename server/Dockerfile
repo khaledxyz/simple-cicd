@@ -1,5 +1,5 @@
 # Development stage
-FROM node:20-alpine AS dev
+FROM node:22-alpine AS dev
 
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
@@ -22,7 +22,7 @@ EXPOSE 5000
 CMD ["pnpm", "dev"]
 
 # Build stage
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
@@ -42,7 +42,7 @@ COPY . .
 RUN pnpm build
 
 # Production stage
-FROM node:20-alpine AS production
+FROM node:22-alpine AS production
 
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
